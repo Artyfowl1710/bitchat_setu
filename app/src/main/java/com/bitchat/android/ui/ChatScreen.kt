@@ -28,6 +28,7 @@ import com.bitchat.android.model.BitchatMessage
 import com.bitchat.android.ui.media.FullScreenImageViewer
 import com.bitchat.android.features.sos.SosManager
 import com.bitchat.android.identity.SosContactStore
+import com.bitchat.android.ui.theme.IndustrialColors
 
 /**
  * Main ChatScreen - REFACTORED to use component-based architecture
@@ -422,7 +423,7 @@ fun ChatInputSection(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = colorScheme.background
+        color = IndustrialColors.Panel
     ) {
         Column {
             HorizontalDivider(color = colorScheme.outline.copy(alpha = 0.3f))
@@ -514,7 +515,7 @@ private fun ChatFloatingHeader(
             .fillMaxWidth()
             .zIndex(1f)
             .windowInsetsPadding(WindowInsets.statusBars), // Extend into status bar area
-        color = colorScheme.background // Solid background color extending into status bar
+        color = IndustrialColors.Panel
     ) {
         TopAppBar(
             title = {

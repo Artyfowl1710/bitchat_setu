@@ -30,6 +30,7 @@ import com.bitchat.android.core.ui.utils.singleOrTripleClickable
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bitchat.android.ui.theme.IndustrialColors
 
 /**
  * Header components for ChatScreen
@@ -182,7 +183,7 @@ fun PeerCounter(
     
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onClick() }.padding(end = 8.dp) // Added right margin to match "bitchat" logo spacing
+        modifier = modifier.clickable { onClick() }.padding(end = 8.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Group,
@@ -360,7 +361,7 @@ private fun MainHeader(
             Text(
                 text = stringResource(R.string.app_brand),
                 style = MaterialTheme.typography.headlineSmall,
-                color = colorScheme.primary,
+                color = IndustrialColors.Ink,
                 modifier = Modifier.singleOrTripleClickable(
                     onSingleClick = onTitleClick,
                     onTripleClick = onTripleTitleClick
@@ -388,7 +389,7 @@ private fun MainHeader(
                     modifier = Modifier
                         .size(16.dp)
                         .clickable { viewModel.openLatestUnreadPrivateChat() },
-                    tint = Color(0xFFFF9500)
+                    tint = IndustrialColors.Accent
                 )
             }
 
