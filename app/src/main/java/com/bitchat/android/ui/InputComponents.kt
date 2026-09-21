@@ -38,6 +38,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.withStyle
 import com.bitchat.android.ui.theme.BASE_FONT_SIZE
+import com.bitchat.android.ui.theme.IndustrialColors
 import com.bitchat.android.features.voice.normalizeAmplitudeSample
 import com.bitchat.android.features.voice.AudioWaveformExtractor
 import com.bitchat.android.ui.media.RealtimeScrollingWaveform
@@ -68,10 +69,10 @@ class SlashCommandVisualTransformation : VisualTransformation {
                 // Add the styled slash command
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFF00FF7F), // Bright green
+                        color = IndustrialColors.Accent,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Medium,
-                        background = Color(0xFF2D2D2D) // Dark gray background
+                        background = IndustrialColors.Recessed
                     )
                 ) {
                     append(match.value)
@@ -112,7 +113,7 @@ class MentionVisualTransformation : VisualTransformation {
                 // Add the styled mention
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFFFF9500), // Orange
+                        color = IndustrialColors.Accent,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -189,14 +190,19 @@ fun MessageInput(
     ) {
         // Text input with placeholder OR visualizer when recording
         Box(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .defaultMinSize(minHeight = 52.dp)
+                .background(IndustrialColors.Recessed, RoundedCornerShape(12.dp))
+                .border(1.dp, if (isFocused.value) IndustrialColors.Accent else IndustrialColors.DeepShadow, RoundedCornerShape(12.dp))
+                .padding(horizontal = 15.dp, vertical = 14.dp)
         ) {
             // Always keep the text field mounted to retain focus and avoid IME collapse
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = colorScheme.primary,
+                    color = colorScheme.onSurface,
                     fontFamily = FontFamily.Monospace
                 ),
                 cursorBrush = SolidColor(if (isRecording) Color.Transparent else colorScheme.primary),
@@ -222,7 +228,7 @@ fun MessageInput(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily.Monospace
                     ),
-                    color = colorScheme.onSurface.copy(alpha = 0.5f), // Muted grey
+                    color = IndustrialColors.MutedInk,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -256,7 +262,7 @@ fun MessageInput(
         // Voice and image buttons when no text (only visible in Mesh chat)
         if (value.text.isEmpty() && showMediaButtons) {
             // Hold-to-record microphone
-            val bg = if (colorScheme.background == Color.Black) Color(0xFF00FF00).copy(alpha = 0.75f) else Color(0xFF008000).copy(alpha = 0.75f)
+            val bg = IndustrialColors.Chassis
 
             // Ensure latest values are used when finishing recording
             val latestSelectedPeer = rememberUpdatedState(selectedPrivatePeer)
@@ -319,24 +325,17 @@ fun MessageInput(
             IconButton(
                 onClick = { if (hasText) onSend() }, // Only execute if there's text
                 enabled = hasText, // Enable only when there's text
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 // Update send button to match input field colors
                 Box(
                     modifier = Modifier
-                        .size(30.dp)
+                        .size(42.dp)
                         .background(
                             color = if (!hasText) {
                                 // Disabled state - muted grey
                                 colorScheme.onSurface.copy(alpha = 0.3f)
-                            } else if (selectedPrivatePeer != null || currentChannel != null) {
-                                // Orange for both private messages and channels when enabled
-                                Color(0xFFFF9500).copy(alpha = 0.75f)
-                            } else if (colorScheme.background == Color.Black) {
-                                Color(0xFF00FF00).copy(alpha = 0.75f) // Bright green for dark theme
-                            } else {
-                                Color(0xFF008000).copy(alpha = 0.75f) // Dark green for light theme
-                            },
+                            } else IndustrialColors.Accent,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -348,14 +347,7 @@ fun MessageInput(
                         tint = if (!hasText) {
                             // Disabled state - muted grey icon
                             colorScheme.onSurface.copy(alpha = 0.5f)
-                        } else if (selectedPrivatePeer != null || currentChannel != null) {
-                            // Black arrow on orange for both private and channel modes
-                            Color.Black
-                        } else if (colorScheme.background == Color.Black) {
-                            Color.Black // Black arrow on bright green in dark theme
-                        } else {
-                            Color.White // White arrow on dark green in light theme
-                        }
+                        } else Color.White
                     )
                 }
             }

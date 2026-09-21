@@ -318,51 +318,6 @@ fun AboutSheet(
                         }
                     }
 
-                    // Appearance Section
-                    item(key = "appearance") {
-                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                            Text(
-                                text = "THEME",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = colorScheme.onBackground.copy(alpha = 0.5f),
-                                letterSpacing = 0.5.sp,
-                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                            )
-                            val themePref by com.bitchat.android.ui.theme.ThemePreferenceManager.themeFlow.collectAsState()
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = colorScheme.surface,
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    ThemeChip(
-                                        label = stringResource(R.string.about_system),
-                                        selected = themePref.isSystem,
-                                        onClick = { com.bitchat.android.ui.theme.ThemePreferenceManager.set(context, com.bitchat.android.ui.theme.ThemePreference.System) },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    ThemeChip(
-                                        label = stringResource(R.string.about_light),
-                                        selected = themePref.isLight,
-                                        onClick = { com.bitchat.android.ui.theme.ThemePreferenceManager.set(context, com.bitchat.android.ui.theme.ThemePreference.Light) },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    ThemeChip(
-                                        label = stringResource(R.string.about_dark),
-                                        selected = themePref.isDark,
-                                        onClick = { com.bitchat.android.ui.theme.ThemePreferenceManager.set(context, com.bitchat.android.ui.theme.ThemePreference.Dark) },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                     // Settings Section - Unified Card with Toggles
                     item(key = "settings") {
                         LaunchedEffect(Unit) { PoWPreferenceManager.init(context) }
