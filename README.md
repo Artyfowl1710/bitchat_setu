@@ -242,7 +242,7 @@ Record actual measurements and device configurations when reporting results. Fea
 
 **Department:** Computer Science and Engineering
 
-**Project Guide:** Prof. Nikahat Mulla
+**Project Guide:** Dr. Nikahat Mulla
 
 **Team Members:**
 - Kaivalya Sunil Sonawane
