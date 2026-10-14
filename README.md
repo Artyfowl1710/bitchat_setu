@@ -1,308 +1,269 @@
+# Setu — Adaptive Device-to-Device Mesh Communication System
+
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/188c42f8-d249-4a72-b27a-e2b4f10a00a8" alt="Bitchat Android Logo" width="480">
+  <strong>Offline-First Communication Through Nearby Devices</strong>
 </p>
 
-> [!WARNING]
-> This software has not received external security review and may contain vulnerabilities and may not necessarily meet its stated security goals. Do not use it for sensitive use cases, and do not rely on its security until it has been reviewed. Work in progress.
+<p align="center">
+  A mini project focused on enabling communication between nearby Android devices when conventional internet or cellular connectivity is unavailable.
+</p>
 
-# bitchat for Android
+---
 
-A secure, decentralized, peer-to-peer messaging app that works over Bluetooth mesh networks. No internet required for mesh chats, no servers, no phone numbers - just pure encrypted communication. Bitchat also supports geohash channels, which use an internet connection to connect you with others in your geographic area.
+## Overview
 
-This is the **Android port** of the original [bitchat iOS app](https://github.com/jackjackbits/bitchat), maintaining 100% protocol compatibility for cross-platform communication.
+**Setu** is an offline-first, device-to-device communication system designed to help messages and other data move across nearby devices even when conventional network infrastructure is unavailable.
 
-## Install bitchat
+The project builds upon the open-source Bitchat Android codebase and explores adaptive communication techniques for low-connectivity environments, local dead zones, and emergency situations.
 
-You can download the latest version of bitchat for Android from the [GitHub Releases page](https://github.com/permissionlesstech/bitchat-android/releases).
+Instead of requiring every device to connect directly to the internet, Setu aims to use nearby devices as intermediate relay nodes. A message can be forwarded from one device to another until it reaches its intended destination, subject to device availability, supported transport mechanisms, and network topology.
 
-Or you can:
+The project also explores lightweight voice-note transmission, opportunistic higher-bandwidth communication, and cooperative emergency-alert forwarding.
 
-[<img alt="Get it on Google Play" height="60" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/>](https://play.google.com/store/apps/details?id=com.bitchat.droid)
+## Problem Statement
 
-**Instructions:**
+Conventional messaging applications generally depend on internet connectivity or cellular infrastructure. In rural areas, disaster-affected regions, underground locations, and network dead zones, this dependency can prevent users from communicating.
 
-1.  **Download the APK:** On your Android device, navigate to the link above and download the latest `.apk` file. Open it.
-2.  **Allow Unknown Sources:** On some devices, before you can install the APK, you may need to enable "Install from unknown sources" in your device's settings. This is typically found under **Settings > Security** or **Settings > Apps & notifications > Special app access**.
-3.  **Install:** Open the downloaded `.apk` file to begin the installation.
+Setu investigates an alternative approach in which nearby smartphones cooperate to relay messages across a local device-to-device network.
 
-## License
+The objective is to reduce dependence on continuous internet connectivity for local communication and provide a foundation for emergency messaging in infrastructure-constrained environments.
 
-This project is released into the public domain. See the [LICENSE](LICENSE.md) file for details.
+## Objectives
 
-## Features
+- Enable offline communication between nearby Android devices.
+- Support multi-hop message forwarding through intermediate devices.
+- Explore compact voice-note encoding for bandwidth-constrained communication.
+- Investigate higher-bandwidth transfer options when supported by compatible devices.
+- Design a cooperative SOS relay mechanism for emergency communication.
+- Evaluate message delivery, transfer performance, compatibility, and reliability under different connectivity conditions.
 
-- **✅ Cross-Platform Compatible**: Full protocol compatibility with iOS bitchat
-- **✅ Decentralized Mesh Network**: Automatic peer discovery and multi-hop message relay over Bluetooth LE
-- **✅ End-to-End Encryption**: X25519 key exchange + AES-256-GCM for private messages
-- **✅ Channel-Based Chats**: Topic-based group messaging with optional password protection
-- **✅ Store & Forward**: Messages cached for offline peers and delivered when they reconnect
-- **✅ Privacy First**: No accounts, no phone numbers, no persistent identifiers
-- **✅ IRC-Style Commands**: Familiar `/join`, `/msg`, `/who` style interface
-- **✅ Message Retention**: Optional channel-wide message saving controlled by channel owners
-- **✅ Emergency Wipe**: Triple-tap logo to instantly clear all data
-- **✅ Modern Android UI**: Jetpack Compose with Material Design 3
-- **✅ Dark/Light Themes**: Terminal-inspired aesthetic matching iOS version
-- **✅ Battery Optimization**: Adaptive scanning and power management
+## Key Features
 
-## Android Setup
+### 1. Bluetooth Low Energy (BLE) Communication
+
+Uses Bluetooth Low Energy as the baseline short-range communication mechanism for discovering nearby devices and exchanging data, subject to the underlying implementation.
+
+### 2. Multi-Hop Message Relay
+
+A message can be forwarded through intermediate devices when the sender and recipient are outside direct communication range.
+
+The intended relay workflow includes message identification, duplicate detection, hop limits, and delivery-status handling.
+
+### 3. Voice-Note Optimization
+
+The project investigates using the **AMR-NB codec at 4.75 kbps** to reduce voice-note payload size for low-bandwidth communication.
+
+The target is to achieve at least a fourfold reduction in encoded file size compared with a 20 kbps AAC baseline, subject to audio quality and measured results.
+
+### 4. Adaptive Transport
+
+The project explores **Wi-Fi Aware** as an optional higher-bandwidth communication path for larger payloads on compatible devices, while retaining BLE as the baseline transport.
+
+Actual transport selection depends on device capabilities and implementation support.
+
+### 5. Cooperative SOS Relay
+
+The proposed emergency workflow uses an `SOS_RELAY` message that can propagate across intermediate devices.
+
+Message identifiers, TTL (Time to Live), and duplicate detection help control repeated forwarding. A relay device that regains internet or cellular connectivity can forward the SOS to an external gateway, provided the gateway integration is configured and available.
+
+**Important:** SOS delivery is not guaranteed. It depends on relay availability, connectivity, gateway configuration, and successful forwarding.
+
+## System Architecture
+
+The intended communication workflow is:
+
+```text
+Sender Device
+     |
+     v
+BLE Device Discovery
+     |
+     v
+Message / Voice Note Preparation
+     |
+     v
+Nearby Relay Device
+     |
+     v
+Multi-Hop Forwarding
+     |
+     v
+Destination Device
+```
+
+For emergency communication, the intended extension is:
+
+```text
+Emergency User
+      |
+      v
+SOS Alert Creation
+      |
+      v
+Nearby Device / Relay Node
+      |
+      v
+Additional Relay Nodes
+      |
+      v
+Connectivity-Enabled Gateway
+      |
+      v
+External Alert Service
+```
+
+These diagrams represent the intended workflows. Actual behavior depends on the features implemented in the current codebase.
+
+## Technology Stack
+
+The project is based on the Bitchat Android codebase and investigates the following technologies:
+
+| Technology | Purpose |
+|---|---|
+| Kotlin | Android application development |
+| Android SDK | Application and device integration |
+| Bluetooth Low Energy (BLE) | Nearby device communication |
+| Wi-Fi Aware | Optional higher-bandwidth peer communication |
+| AMR-NB | Low-bitrate voice-note encoding |
+| Android networking APIs | Device discovery and data transfer |
+| External gateway integration | Forwarding emergency alerts when connectivity is available |
+
+The exact libraries and supported Android versions depend on the implementation in this repository.
+
+## Getting Started
 
 ### Prerequisites
 
-- **Android Studio**: Arctic Fox (2020.3.1) or newer
-- **Android SDK**: API level 26 (Android 8.0) or higher
-- **Kotlin**: 1.8.0 or newer
-- **Gradle**: 7.0 or newer
+- A computer with Android development tools installed.
+- Android Studio compatible with the project's Gradle and Android Gradle Plugin versions.
+- A compatible JDK as required by the project.
+- Android devices with the required Bluetooth and other supported hardware capabilities.
+- USB debugging enabled for physical-device testing, if needed.
 
-### Build Instructions
+### Installation
 
-1. **Clone the repository:**
+1. Clone the repository:
+
    ```bash
-   git clone https://github.com/permissionlesstech/bitchat-android.git
-   cd bitchat-android
+   git clone https://github.com/Artyfowl1710/bitchat_setu.git
    ```
 
-2. **Open in Android Studio:**
+2. Enter the project directory:
+
    ```bash
-   # Open Android Studio and select "Open an Existing Project"
-   # Navigate to the bitchat-android directory
+   cd bitchat_setu
    ```
 
-3. **Build the project:**
-   ```bash
-   ./gradlew build
-   ```
+3. Open the project in Android Studio.
 
-4. **Install on device:**
-   ```bash
-   ./gradlew installDebug
-   ```
+4. Allow Gradle synchronization to complete.
 
-### Development Build
+5. Review the project's build configuration, SDK requirements, and any required local configuration.
 
-For development builds with debugging enabled:
+6. Connect a compatible Android device or configure an emulator.
+
+7. Build and run the application using Android Studio.
+
+If you prefer the terminal, use the Gradle wrapper commands supported by the repository. For example, on Windows:
+
+```powershell
+.\gradlew.bat assembleDebug
+```
+
+On Linux or macOS:
 
 ```bash
 ./gradlew assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### Release Build
+These commands assume the repository contains a working Gradle wrapper and a compatible Android application module.
 
-For production releases:
+## Testing and Evaluation
 
-```bash
-./gradlew assembleRelease
-```
+The project can be evaluated using the following test scenarios:
 
-## Android-Specific Requirements
+| Test Case | Purpose |
+|---|---|
+| Nearby device discovery | Verify that compatible devices can discover one another |
+| Direct message transfer | Check message transmission between two devices |
+| Multi-hop forwarding | Verify forwarding through intermediate devices |
+| Voice-note transfer | Check voice-note encoding, transfer, and playback |
+| Codec comparison | Compare encoded file sizes against the selected AAC baseline |
+| Wi-Fi Aware compatibility | Verify behavior on supported and unsupported devices |
+| SOS relay | Test emergency-alert propagation and gateway forwarding |
+| Failure handling | Observe behavior during disconnection, relay failure, and unavailable connectivity |
+| Performance evaluation | Measure delivery success, transfer time, and battery consumption |
 
-### Permissions
+Record actual measurements and device configurations when reporting results. Features that have not been implemented or tested should be reported as pending rather than completed.
 
-The app requires the following permissions (automatically requested):
+## Project Scope
 
-- **Bluetooth**: Core BLE functionality
-- **Location**: Required for BLE scanning on Android
-- **Network**: Expand your mesh through public internet relays
-- **Notifications**: Message alerts and background updates
+### Included
 
-### Hardware Requirements
+- Offline-first device-to-device communication.
+- BLE-based peer communication.
+- Multi-hop relay and message-forwarding evaluation.
+- Voice-note optimization research.
+- Optional higher-bandwidth transport investigation.
+- Cooperative SOS relay and gateway integration.
+- Functional and performance testing.
 
-- **Bluetooth LE (BLE)**: Required for mesh networking
-- **Android 8.0+**: API level 26 minimum
-- **RAM**: 2GB recommended for optimal performance
+### Outside the Current Scope
 
-## Usage
+- Live voice and video calling.
+- Replacing the underlying encryption protocol or changing non-SOS message security.
+- Making LoRa or Meshtastic hardware a requirement.
+- Guaranteeing emergency delivery when no relay or external connectivity is available.
 
-### Basic Commands
+## Limitations
 
-- `/j #channel` - Join or create a channel
-- `/m @name message` - Send a private message
-- `/w` - List online users
-- `/channels` - Show all discovered channels
-- `/block @name` - Block a peer from messaging you
-- `/block` - List all blocked peers
-- `/unblock @name` - Unblock a peer
-- `/clear` - Clear chat messages
-- `/pass [password]` - Set/change channel password (owner only)
-- `/transfer @name` - Transfer channel ownership
-- `/save` - Toggle message retention for channel (owner only)
+- BLE communication range and reliability depend on the environment and device hardware.
+- Android background-execution and Bluetooth permission restrictions can affect communication.
+- Wi-Fi Aware availability varies across devices and Android implementations.
+- Voice compression may involve trade-offs between file size and audio quality.
+- SOS gateway delivery requires a suitable gateway and available external connectivity.
+- Multi-hop delivery depends on the availability and cooperation of intermediate devices.
 
-### Getting Started
+## Future Enhancements
 
-1. **Install the app** on your Android device (requires Android 8.0+)
-2. **Grant permissions** for Bluetooth and location when prompted
-3. **Launch bitchat** - it will auto-start mesh networking
-4. **Set your nickname** or use the auto-generated one
-5. **Connect automatically** to nearby iOS and Android bitchat users
-6. **Join a channel** with `/j #general` or start chatting in public
-7. **Messages relay** through the mesh network to reach distant peers
+- Improved adaptive routing and relay selection.
+- More extensive testing across Android manufacturers.
+- Better battery-aware forwarding strategies.
+- Improved delivery acknowledgements and failure recovery.
+- Further voice-codec optimization and objective audio-quality evaluation.
+- More robust emergency gateway integration and delivery-status reporting.
 
-### Android UI Features
+## Team
 
-- **Jetpack Compose UI**: Modern Material Design 3 interface
-- **Dark/Light Themes**: Terminal-inspired aesthetic matching iOS
-- **Haptic Feedback**: Vibrations for interactions and notifications
-- **Adaptive Layout**: Optimized for various Android screen sizes
-- **Message Status**: Real-time delivery and read receipts
-- **RSSI Indicators**: Signal strength colors for each peer
+**Project:** Adaptive Device-to-Device Mesh Communication System (Setu)
 
-### Channel Features
+**Institution:** Sardar Patel Institute of Technology, Mumbai
 
-- **Password Protection**: Channel owners can set passwords with `/pass`
-- **Message Retention**: Owners can enable mandatory message saving with `/save`
-- **@ Mentions**: Use `@nickname` to mention users (with autocomplete)
-- **Ownership Transfer**: Pass control to trusted users with `/transfer`
+**Department:** Computer Science and Engineering
 
-## Security & Privacy
+**Project Guide:** Prof. Nikahat Mulla
 
-### Encryption
-- **Private Messages**: X25519 key exchange + AES-256-GCM encryption
-- **Channel Messages**: Argon2id password derivation + AES-256-GCM
-- **Digital Signatures**: Ed25519 for message authenticity
-- **Forward Secrecy**: New key pairs generated each session
+**Team Members:**
+- Kaivalya Sunil Sonawane
+- Mihir Harshad Khatri
+- Aniket Patil
 
-### Privacy Features
-- **No Registration**: No accounts, emails, or phone numbers required
-- **Ephemeral by Default**: Messages exist only in device memory
-- **Cover Traffic**: Random delays and dummy messages prevent traffic analysis
-- **Emergency Wipe**: Triple-tap logo to instantly clear all data
-- **Bundled Tor Support**: Built-in Tor network integration for enhanced privacy when internet connectivity is available
+## Acknowledgements
 
-## Performance & Efficiency
+Setu builds upon the open-source Bitchat Android project. The original project's implementation and documentation should be consulted for inherited functionality, build requirements, and applicable licensing terms.
 
-### Message Compression
-- **LZ4 Compression**: Automatic compression for messages >100 bytes
-- **30-70% bandwidth savings** on typical text messages
-- **Smart compression**: Skips already-compressed data
+- **Setu repository:** https://github.com/Artyfowl1710/bitchat_setu
+- **Original Bitchat Android repository:** https://github.com/permissionlesstech/bitchat-android
 
-### Battery Optimization
-- **Adaptive Power Modes**: Automatically adjusts based on battery level
-  - Performance mode: Full features when charging or >60% battery
-  - Balanced mode: Default operation (30-60% battery)
-  - Power saver: Reduced scanning when <30% battery
-  - Ultra-low power: Emergency mode when <10% battery
-- **Background efficiency**: Automatic power saving when app backgrounded
-- **Configurable scanning**: Duty cycle adapts to battery state
+Please retain the original project's copyright notices and license files, and ensure that modifications and redistribution comply with its applicable license.
 
-### Network Efficiency
-- **Optimized Bloom filters**: Faster duplicate detection with less memory
-- **Message aggregation**: Batches small messages to reduce transmissions
-- **Adaptive connection limits**: Adjusts peer connections based on power mode
+## License
 
-## Technical Architecture
+Refer to the repository's existing `LICENSE` file and the original Bitchat Android project's license before redistributing this code. Do not assume that the project has a new or different license unless one has been explicitly established.
 
-### Binary Protocol
-bitchat uses an efficient binary protocol optimized for Bluetooth LE:
-- Compact packet format with 1-byte type field
-- TTL-based message routing (max 7 hops)
-- Automatic fragmentation for large messages
-- Message deduplication via unique IDs
+---
 
-### Mesh Networking
-- Each device acts as both client and peripheral
-- Automatic peer discovery and connection management
-- Store-and-forward for offline message delivery
-- Adaptive duty cycling for battery optimization
-
-### Android-Specific Optimizations
-- **Coroutine Architecture**: Asynchronous operations for mesh networking
-- **Kotlin Coroutines**: Thread-safe concurrent mesh operations
-- **EncryptedSharedPreferences**: Secure storage for user settings
-- **Lifecycle-Aware**: Proper handling of Android app lifecycle
-- **Battery Optimization**: Foreground service and adaptive scanning
-
-## Android Technical Architecture
-
-### Core Components
-
-1. **BitchatApplication.kt**: Application-level initialization and dependency injection
-2. **MainActivity.kt**: Main activity handling permissions and UI hosting
-3. **ChatViewModel.kt**: MVVM pattern managing app state and business logic
-4. **BluetoothMeshService.kt**: Core BLE mesh networking (central + peripheral roles)
-5. **EncryptionService.kt**: Cryptographic operations using BouncyCastle
-6. **BinaryProtocol.kt**: Binary packet encoding/decoding matching iOS format
-7. **ChatScreen.kt**: Jetpack Compose UI with Material Design 3
-
-### Dependencies
-
-- **Jetpack Compose**: Modern declarative UI
-- **BouncyCastle**: Cryptographic operations (X25519, Ed25519, AES-GCM)
-- **Nordic BLE Library**: Reliable Bluetooth LE operations
-- **Kotlin Coroutines**: Asynchronous programming
-- **LZ4**: Message compression (when enabled)
-- **EncryptedSharedPreferences**: Secure local storage
-
-### Binary Protocol Compatibility
-
-The Android implementation maintains 100% binary protocol compatibility with iOS:
-- **Header Format**: Identical 13-byte header structure
-- **Packet Types**: Same message types and routing logic
-- **Encryption**: Identical cryptographic algorithms and key exchange
-- **UUIDs**: Same Bluetooth service and characteristic identifiers
-- **Fragmentation**: Compatible message fragmentation for large content
-
-## Publishing to Google Play
-
-### Preparation
-
-1. **Update version information:**
-   ```kotlin
-   // In app/build.gradle.kts
-   defaultConfig {
-       versionCode = 2  // Increment for each release
-       versionName = "1.1.0"  // User-visible version
-   }
-   ```
-
-2. **Create a signed release build:**
-   ```bash
-   ./gradlew assembleRelease
-   ```
-
-3. **Generate app bundle (recommended for Play Store):**
-   ```bash
-   ./gradlew bundleRelease
-   ```
-
-### Play Store Requirements
-
-- **Target API**: Latest Android API (currently 34)
-- **Privacy Policy**: Required for apps requesting sensitive permissions
-- **App Permissions**: Justify Bluetooth and location usage
-- **Content Rating**: Complete questionnaire for age-appropriate content
-
-### Distribution
-
-- **Google Play Store**: Main distribution channel
-- **F-Droid**: For open-source distribution
-- **Direct APK**: For testing and development
-
-## Cross-Platform Communication
-
-This Android port enables seamless communication with the original iOS bitchat app:
-
-- **iPhone ↔ Android**: Full bidirectional messaging
-- **Mixed Groups**: iOS and Android users in same channels
-- **Feature Parity**: All commands and encryption work across platforms
-- **Protocol Sync**: Identical message format and routing behavior
-
-**iOS Version**: For iPhone/iPad users, get the original bitchat at [github.com/jackjackbits/bitchat](https://github.com/jackjackbits/bitchat)
-
-## Contributing
-
-Contributions are welcome! Key areas for enhancement:
-
-1. **Performance**: Battery optimization and connection reliability
-2. **UI/UX**: Additional Material Design 3 features
-3. **Security**: Enhanced cryptographic features
-4. **Testing**: Unit and integration test coverage
-5. **Documentation**: API documentation and development guides
-
-## Support & Issues
-
-- **Bug Reports**: [Create an issue](../../issues) with device info and logs
-- **Feature Requests**: [Start a discussion](https://github.com/orgs/permissionlesstech/discussions)
-- **Security Issues**: Email security concerns privately
-- **iOS Compatibility**: Cross-reference with [original iOS repo](https://github.com/jackjackbits/bitchat)
-
-For iOS-specific issues, please refer to the [original iOS bitchat repository](https://github.com/jackjackbits/bitchat).
+<p align="center">
+  <strong>Setu — Connecting People Through Nearby Devices</strong>
+</p>
